@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON2Tree</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header class="header">
+        <h1>JSON2Tree</h1>
+    </header>
+    <section id="home">
+
+    <div class="container1">
+        <p>Convert your JSON data into a visual tree structure.</p>
+        <div class="text">
+        <textarea id="jsonInput" placeholder="Enter JSON here..."></textarea>
+        </div>
+        <button class="btn" onclick="generateTree()">Convert to Tree</button>
+        <button class="btn" onclick="clearEg()">Clear</button>
+    </div>
+
+    <div class="container2">
+        <h2>Folder Structure</h2>
+        <div id="output">
+        </div>
+    </div>
+    </section>
+    <footer class="footer">
+        <p>&copy; 2024 JSON2Tree. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+
+</body>
+</html>
