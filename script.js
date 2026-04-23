@@ -40,9 +40,13 @@ function createNode(node) {
 function generateTree(){
   const input = document.getElementById("jsonInput").value;
   output.innerHTML = "";
-  const data = JSON.parse(egJson);
+  try{
+  const data = JSON.parse(input);
   const tree = createNode(data);
   output.appendChild(tree);
+  }catch(e){
+    alert("Invalid JSON!");
+  }
 }
 
 const egJson=`{
