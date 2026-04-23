@@ -70,7 +70,6 @@ textarea {
     flex: 1;
     background-color: rgb(30, 28, 34);
     padding: 20px;
-    height: 100vh;
     color:white;
 }
 .container2 h2{
@@ -124,8 +123,10 @@ textarea {
           overflow-x: hidden;
     }
     .container2{
-        height: 80vh;
         width: 100%;
+    }
+    #output{
+        height:500px;
     }
 }
 
