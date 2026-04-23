@@ -24,7 +24,7 @@ body {
     font-family: 'Verdana', sans-serif;
 }
 
-#home {
+.home {
     display: flex;
     flex-direction: row;
 }
@@ -136,3 +136,17 @@ textarea {
     font-size: 15px;
     padding-bottom: 30px;
 }
+
+@media(max-width: 600px) {
+    .home{
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+    }    
+    .container2{
+        height: 80vh;
+        width: 100%;
+
+    }
+}
+
