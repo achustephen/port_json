@@ -11,7 +11,9 @@
 <body>
     <header class="header">
         <h1>JSON2Tree</h1>
-                <input type="text" placeholder="Search for files...">&#128269;
+                <input id="searchInput" type="text" placeholder="Search for files...">
+                <button id="search-btn" onclick="debounce()">&#128269;</button>
+                <div class="result"></div>
     </header>
     <section class="home">
     <div class="container1">
@@ -22,7 +24,6 @@
         <button class="btn" onclick="generateTree()">Convert to Tree</button>
         <button class="btn" onclick="clearEg()">Clear</button>
     </div>
-
     <div class="container2">
         <h2>Folder Structure</h2>
         <div id="output">
