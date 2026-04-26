@@ -79,12 +79,6 @@ function clearEg() {
   textarea.value = "";
   output.innerHTML= "";
 }
-function debounce(){
-  let timer;
-  document.getElementById("searchInput").addEventListener("input", () => {
-  clearTimeout(timer);
-  timer = setTimeout(searchItem, 300);
-});}
 
 function searchItem(){
   const search=document.getElementById("searchInput").value.toLowerCase();
