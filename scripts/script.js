@@ -1,16 +1,24 @@
+import {debounce} from './utils.js';
+const convertBtn = document.getElementById("convert-btn");
+const clearBtn = document.getElementById("clear-btn");
+const searchBtn = document.getElementById("search-btn");
 const output = document.getElementById("output");
-let files=[];   
+const searchInput=document.getElementById("searchInput");
+
+// NODE CREATION
 function createNode(node) {
   const element = document.createElement("div");
+  element.setAttribute("data-name", node.name.toLowerCase());
 
   if (node.type === "folder"){
     element.classList.add("folder");
+
     const header=document.createElement("div");
     header.classList.add("folder-header");
     header.textContent = "📁" + node.name;
+    header.setAttribute("data-name", node.name.toLowerCase());
      element.appendChild(header);
-    // let head=header.textContent;
-    // files.push(head);
+
       const childrenContainer = document.createElement("div");
       childrenContainer.classList.add("children","hidden");
       if (node.children) {
@@ -22,6 +30,7 @@ function createNode(node) {
     
     header.addEventListener("click", () =>{
       childrenContainer.classList.toggle("hidden");
+
       if(childrenContainer.classList.contains("hidden")){
         header.textContent = "\u2193" + "📁" + node.name;
       }
@@ -33,22 +42,27 @@ function createNode(node) {
   else {
     element.classList.add("file");
     element.textContent = "📄" + node.name;
-    // let elem=element.textContent;
-    // files.push(elem);
   }
   return element;
 }
+
+// TREE GENERATION
+let data;
+
 function generateTree(){
   const input = document.getElementById("jsonInput").value;
   output.innerHTML = "";
+
   try{
-  const data = JSON.parse(input);
+  data = JSON.parse(input);
   const tree = createNode(data);
   output.appendChild(tree);
   }catch(e){
     alert("Invalid JSON!");
   }
 }
+convertBtn.addEventListener("click",generateTree);
+
 const egJson=`{
   "name": "Portfolio",
   "type": "folder",
@@ -75,23 +89,40 @@ const egJson=`{
 }`;
 const textarea = document.getElementById("jsonInput");
 textarea.value = egJson;
+
+// FUNCTION TO CLEAR EXAMPLE
 function clearEg() {
   textarea.value = "";
   output.innerHTML= "";
 }
+clearBtn.addEventListener("click",clearEg);
 
-function searchItem(){
-  const search=document.getElementById("searchInput").value.toLowerCase();
-  const result=document.getElementById("result");
-  result.innerHTML= "";
-  const ul=document.createElement("ul");
-  files.forEach(file => {
-    if(file.toLowerCase().includes(search))
-    {
-      const li=document.createElement("li");
-      li.textContent=file;
-      console.log(li);
-      ul.appendChild(li);
+// REAL-TIME SEARCH
+function handleSearch() {
+  const query = searchInput.value.toLowerCase();
+  const nodes=document.querySelectorAll("#output [data-name]");
+
+  nodes.forEach(node => {
+    const name=node.getAttribute("data-name").toLowerCase();
+
+    if(!query ){
+      node.style.display="";
+      return;
+    }
+    if(name.includes(query)){
+      node.style.display="";
+      let parent = node.parentElement;
+      while (parent && parent.id !== "output") {
+        parent.style.display = "";
+        parent=parent.parentElement;
+      }
+    } 
+    else {
+      node.style.display = "none";
     }
   });
 }
+// EVENTS
+const debounced = debounce(handleSearch, 250);
+searchInput.addEventListener("keydown", debounced);
+searchBtn.addEventListener("click",handleSearch);
