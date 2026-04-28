@@ -1,88 +1,98 @@
-import {debounce} from './utils.js';
+import { debounce } from './utils.js';
+
 const convertBtn = document.getElementById("convert-btn");
 const clearBtn = document.getElementById("clear-btn");
 const searchBtn = document.getElementById("search-btn");
 const output = document.getElementById("output");
-const searchInput=document.getElementById("searchInput");
+const searchInput = document.getElementById("searchInput");
 
 // NODE CREATION
-function createNode(node) {
+function createNode(node, mode = "normal") {
   const element = document.createElement("div");
   element.setAttribute("data-name", node.name.toLowerCase());
-
-  if (node.type === "folder"){
+  if (node.type === "folder") {
     element.classList.add("folder");
-
-    const header=document.createElement("div");
+    const header = document.createElement("div");
     header.classList.add("folder-header");
     header.textContent = "📁" + node.name;
     header.setAttribute("data-name", node.name.toLowerCase());
-     element.appendChild(header);
-
-      const childrenContainer = document.createElement("div");
-      childrenContainer.classList.add("children","hidden");
-      if (node.children) {
+    element.appendChild(header);
+    const childrenContainer = document.createElement("div");
+    childrenContainer.classList.add("children");
+    if (mode === "normal") {
+      childrenContainer.classList.add("hidden");
+    }
+    if (node.children) {
       node.children.forEach(child => {
-        childrenContainer.appendChild(createNode(child));
+        childrenContainer.appendChild(createNode(child, mode));
       });
     }
     element.appendChild(childrenContainer);
-    
-    header.addEventListener("click", () =>{
+    header.addEventListener("click", () => {
       childrenContainer.classList.toggle("hidden");
-
-      if(childrenContainer.classList.contains("hidden")){
+      if (childrenContainer.classList.contains("hidden")) {
         header.textContent = "\u2193" + "📁" + node.name;
-      }
-      else{
+      } else {
         header.textContent = "\u2191" + "📁" + node.name;
       }
     });
-  } 
-  else {
+  } else {
     element.classList.add("file");
     element.textContent = "📄" + node.name;
   }
   return element;
 }
 
+// FILTER
+function filterTree(node, text) {
+  const name = node.name.toLowerCase();
+  const match = name.includes(text);
+  if (node.type === "file") {
+    return match ? node : null;
+  }
+  let children = [];
+  if (node.children) {
+    for (let child of node.children) {
+      const result = filterTree(child, text);
+      if (result) children.push(result);
+    }
+  }
+  if(match || children.length > 0) {
+    return {
+      name: node.name,
+      type: node.type,
+      children: children
+    };
+  }
+  return null;
+}
+
 // TREE GENERATION
 let data;
-
-function generateTree(){
+function generateTree() {
   const input = document.getElementById("jsonInput").value;
   output.innerHTML = "";
-
-  try{
-  data = JSON.parse(input);
-  const tree = createNode(data);
-  output.appendChild(tree);
-  }catch(e){
+  searchInput.disabled = false;
+  try {
+    data = JSON.parse(input);
+    const tree = createNode(data, "normal");
+    output.appendChild(tree);
+  } catch (e) {
     alert("Invalid JSON!");
   }
 }
-convertBtn.addEventListener("click",generateTree);
-
-const egJson=`{
+convertBtn.addEventListener("click", generateTree);
+const egJson = `{
   "name": "Portfolio",
   "type": "folder",
   "children": [
-     {
-      "name": "index.html",
-      "type": "file"
-    },
-    {
-      "name": "script.js",
-      "type": "file"
-    },
+    { "name": "index.html", "type": "file" },
+    { "name": "script.js", "type": "file" },
     {
       "name": "style",
       "type": "folder",
       "children": [
-        {
-          "name": "styles.css",
-          "type": "file"
-        }
+        { "name": "styles.css", "type": "file" }
       ]
     }
   ]
@@ -90,39 +100,30 @@ const egJson=`{
 const textarea = document.getElementById("jsonInput");
 textarea.value = egJson;
 
-// FUNCTION TO CLEAR EXAMPLE
+// CLEAR
 function clearEg() {
   textarea.value = "";
-  output.innerHTML= "";
+  output.innerHTML = "";
+  data = null;
 }
-clearBtn.addEventListener("click",clearEg);
+clearBtn.addEventListener("click", clearEg);
 
 // REAL-TIME SEARCH
 function handleSearch() {
+  if (!data) return;
   const query = searchInput.value.toLowerCase();
-  const nodes=document.querySelectorAll("#output [data-name]");
-
-  nodes.forEach(node => {
-    const name=node.getAttribute("data-name").toLowerCase();
-
-    if(!query ){
-      node.style.display="";
-      return;
-    }
-    if(name.includes(query)){
-      node.style.display="";
-      let parent = node.parentElement;
-      while (parent && parent.id !== "output") {
-        parent.style.display = "";
-        parent=parent.parentElement;
-      }
-    } 
-    else {
-      node.style.display = "none";
-    }
-  });
+  output.innerHTML = "";
+  if (!query) {
+    output.appendChild(createNode(data, "normal"));
+    return;
+  }
+  const filtered = filterTree(data, query);
+  if (filtered) {
+    output.appendChild(createNode(filtered, "search"));
+  }
 }
+
 // EVENTS
 const debounced = debounce(handleSearch, 250);
-searchInput.addEventListener("keydown", debounced);
-searchBtn.addEventListener("click",handleSearch);
+searchInput.addEventListener("input", debounced);
+searchBtn.addEventListener("click", handleSearch);
