@@ -1,0 +1,5 @@
+arrow constants*
+what is the relevance of mode*
+create constants for file and folder and debounce interval*
+functionality of filterTree(recursion)*
+search button removal*

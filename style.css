@@ -28,7 +28,7 @@ body {
 input{
     right:0;
     margin-left:860px;
-    background-color: rgb(23, 21, 25);
+    background-color: rgb(19, 17, 20);
     border-radius:15px;
     border: 1px solid black;
     color:white;
@@ -37,20 +37,13 @@ input{
     font-size: 17px;
     padding:3px;
 }
-#search-btn{
+#search-icon{
     background-color: rgb(30, 28, 34);
-    border: 15px rgb(40, 38, 45);
-    margin-left: 3px;
-    border-radius: 22px;
-    padding: 8px;
+    border: 5px rgb(40, 38, 45);
+    margin-left: 1px;
+    border-radius: 5px;
+    padding: 4px;
 }
-#search-btn:hover{
-    background-color:rgb(51, 48, 54);
-}
-#search-btn:active{
-     background-color:rgb(51, 48, 54);
-}
-
 .home {
     display: flex;
     flex-direction: row;
@@ -123,10 +116,28 @@ textarea {
     color:aqua;
     border-radius: 4px;
 }
+
 .folder-header:active{
     transform: translateY(4px);
     background-color: rgb(21, 16, 28);
     color: aqua;
+}
+.rename-btn{
+    position: absolute;
+    text-align: center;
+    background: rgb(15, 14, 14);
+    border: 1px solid black;
+    color:lightgrey;
+    display:none;
+    cursor:pointer;
+    right:350px;
+    padding:2px;
+    font-size:12px;
+}
+.folder:hover, .file:hover{
+ .rename-btn{
+        display:block;
+    }
 }
 .hidden{
     display:none;
