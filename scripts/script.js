@@ -5,11 +5,12 @@ const convertBtn=document.getElementById("convert-btn");
 const clearBtn=document.getElementById("clear-btn");
 const output=document.getElementById("output");
 const searchInput=document.getElementById("searchInput");
+const clearJson=document.getElementById("clearJson");
+const toJson=document.getElementById("reconvert");
 
 // NODE CREATION
 function createNode(node, mode = "normal") {
   const element=document.createElement("div");
-  element.nodeRef=node;
   const renameBtn=document.createElement("button");
   renameBtn.className="rename-btn";
   renameBtn.textContent="Rename";
@@ -26,9 +27,6 @@ function createNode(node, mode = "normal") {
     input.focus();
     function save(){
       const newName = input.value.trim();
-      if (newName=== "") {
-      newName="Untitled";
-      }
       node.name=newName;
       const newLabel=document.createElement("span");
       newLabel.classList.add("label");
@@ -45,12 +43,7 @@ function createNode(node, mode = "normal") {
     });
   });
 
-  // JSON UPDATE
-  function updateJSON() {
-    document.getElementById("jsonInput").value =JSON.stringify(data, null, 2);
-  }
-
-  // FOLDER
+  //CREATES NODE FOR FOLDER OR FILE
   if (node.type === type.folder) {
     element.classList.add("folder");
     const header=document.createElement("div");
@@ -59,7 +52,7 @@ function createNode(node, mode = "normal") {
     label.classList.add("label");
     label.textContent="📁 " + node.name;
     header.appendChild(label);
-    header.appendChild(renameBtn);
+    element.appendChild(renameBtn);
     element.appendChild(header);
     const children=document.createElement("div");
     children.classList.add("children");
@@ -72,7 +65,8 @@ function createNode(node, mode = "normal") {
       });
     }
     element.appendChild(children);
-    header.addEventListener("click", () => {
+    header.addEventListener("click", (e) => {
+      if(e.target.closest(".rename-btn")) return;
       children.classList.toggle("hidden");
       if (children.classList.contains("hidden")) {
         label.textContent=downArrow + "📁 " + node.name;
@@ -92,6 +86,11 @@ function createNode(node, mode = "normal") {
   return element;
 }
 
+// JSON UPDATE
+  function updateJSON() {
+    document.getElementById("jsonInput").value=JSON.stringify(data,null,1);
+  }
+
 // RIGHT CLICK
 document.addEventListener("contextmenu", (e) => {
   const item= e.target.closest(".folder, .file");
@@ -103,14 +102,13 @@ document.addEventListener("contextmenu", (e) => {
   const btn= item.querySelector(".rename-btn");
   if (!btn) return;
   btn.style.display= "block";
-  btn.style.position= "fixed";
-  btn.style.top= e.clientY + "px";
-  btn.style.left= e.clientX + "px";
+  btn.style.position= "absolute";
+  btn.style.top = (e.clientY + 5) + "px";
+  btn.style.left = (e.clientX + 5) + "px";
 });
 
 // CLICK TO HIDE BUTTON
 document.addEventListener("click", (e) => {
-  if (e.target.closest(".rename-btn")) return;
   document.querySelectorAll(".rename-btn").forEach(btn => {
     btn.style.display="none";
   });
@@ -179,7 +177,7 @@ clearBtn.addEventListener("click", () => {
   data = null;
 });
 
-// SEARCH
+// SEARCH HANDLING
 function handleSearch() {
   if (!data) return;
   const query = searchInput.value.toLowerCase();
@@ -194,3 +192,36 @@ function handleSearch() {
   }
 }
 searchInput.addEventListener("input", debounce(handleSearch, time));
+clearJson.addEventListener("click",()=>{
+  textarea.value="";
+});
+
+function createJson(element) {
+  let name = element.querySelector(".label").textContent.slice(2);
+  let name1;
+  const isFolder = element.classList.contains("folder");
+  if(isFolder){
+    name1=name.replace(/\u2193|\u2191/,"");
+  }
+  if (!isFolder) {
+    return { name, type: "file" };
+  }
+  const childrenContainer = element.querySelector(".children");
+  const children = [];
+  if (childrenContainer) {
+    const childNodes= childrenContainer.children;
+    for (let i = 0; i < childNodes.length; i++) {
+      const childJson = createJson(childNodes[i]);
+      if (childJson) {
+        children.push(childJson);
+      }
+    }
+  }
+  return { name1, type: "folder", children };
+}
+toJson.addEventListener("click" , ()=>{
+  const dem=document.querySelector("#output > .folder");
+  const json=createJson(dem);
+  const newJson=JSON.stringify(json,null,1);
+  textarea.value=newJson;
+});
