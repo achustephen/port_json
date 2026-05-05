@@ -177,7 +177,6 @@ textarea {
     .home{
         display: flex;
         flex-direction: column;
-        overflow-x: hidden;
     }    
     html{
           overflow-x: hidden;
@@ -187,5 +186,8 @@ textarea {
     }
     #output{
         height:500px;
+    }
+    .container2 h2{
+        font-size:18px;     
     }
 }

@@ -1,6 +1,7 @@
-import { debounce } from './utils.js';
-import { downArrow, upArrow, type, time } from './constants.js';
+import {debounce} from './utils.js';
+import {type,time,egJson} from './constants.js';
 
+//HTML ELEMENTS
 const convertBtn=document.getElementById("convert-btn");
 const clearBtn=document.getElementById("clear-btn");
 const output=document.getElementById("output");
@@ -9,7 +10,7 @@ const clearJson=document.getElementById("clearJson");
 const toJson=document.getElementById("reconvert");
 
 // NODE CREATION
-function createNode(node, mode = "normal") {
+function createNode(node,mode="normal") {
   const element=document.createElement("div");
   const renameBtn=document.createElement("button");
   renameBtn.className="rename-btn";
@@ -26,7 +27,7 @@ function createNode(node, mode = "normal") {
     label.replaceWith(input);
     input.focus();
     function save(){
-      const newName = input.value.trim();
+      const newName=input.value.trim();
       node.name=newName;
       const newLabel=document.createElement("span");
       newLabel.classList.add("label");
@@ -43,8 +44,8 @@ function createNode(node, mode = "normal") {
     });
   });
 
-  //CREATES NODE FOR FOLDER OR FILE
-  if (node.type === type.folder) {
+  //CREATES UI FOR FOLDER OR FILE
+  if (node.type===type.folder) {
     element.classList.add("folder");
     const header=document.createElement("div");
     header.classList.add("folder-header");
@@ -68,11 +69,6 @@ function createNode(node, mode = "normal") {
     header.addEventListener("click", (e) => {
       if(e.target.closest(".rename-btn")) return;
       children.classList.toggle("hidden");
-      if (children.classList.contains("hidden")) {
-        label.textContent=downArrow + "📁 " + node.name;
-      } else {
-        label.textContent=upArrow + "📁 " + node.name;
-      }
     });
   } 
   else {
@@ -114,8 +110,8 @@ document.addEventListener("click", (e) => {
   });
 });
 
-// TREE FILTERING
-function filterTree(node, text) {
+// SEARCH FILTERING
+function filterTree(node,text) {
   const match=node.name.toLowerCase().includes(text);
   if (node.type===type.file) {
     return match?node:null;
@@ -123,16 +119,16 @@ function filterTree(node, text) {
   let children= [];
   if (node.children) {
     for (let child of node.children) {
-      const result = filterTree(child, text);
+      const result=filterTree(child, text);
       if (result) children.push(result);
     }
   }
   if (match) return node;
-  if (children.length > 0) {
+  if (children.length>0) {
     return {
-      name: node.name,
-      type: node.type,
-      children: children
+      name:node.name,
+      type:node.type,
+      children:children
     };
   }
   return null;
@@ -141,87 +137,85 @@ function filterTree(node, text) {
 // TREE GENERATION
 let data;
 function generateTree() {
-  const input = document.getElementById("jsonInput").value;
-  output.innerHTML = "";
+  const input=document.getElementById("jsonInput").value;
+  output.innerHTML= "";
   try {
-    data = JSON.parse(input);
+    data=JSON.parse(input);
     output.appendChild(createNode(data));
-  } catch {
+  } catch{
     alert("Invalid JSON!");
   }
 }
-convertBtn.addEventListener("click", generateTree);
+convertBtn.addEventListener("click",generateTree);
 
 // DEFAULT JSON
-const textarea = document.getElementById("jsonInput");
-textarea.value = `{
-  "name": "Portfolio",
-  "type": "folder",
-  "children": [
-    { "name": "index.html", "type": "file" },
-    { "name": "script.js", "type": "file" },
-    {
-      "name": "style",
-      "type": "folder",
-      "children": [
-        { "name": "styles.css", "type": "file" }
-      ]
-    }
-  ]
-}`;
+const textarea=document.getElementById("jsonInput");
+textarea.value=egJson; 
 
-// CLEAR
+// CLEAR JSON AND UI
 clearBtn.addEventListener("click", () => {
-  textarea.value = "";
-  output.innerHTML = "";
-  data = null;
+  textarea.value= "";
+  output.innerHTML= "";
+  data=null;
 });
 
 // SEARCH HANDLING
 function handleSearch() {
   if (!data) return;
-  const query = searchInput.value.toLowerCase();
-  output.innerHTML = "";
+  const query=searchInput.value.toLowerCase();
+  output.innerHTML= "";
   if (!query) {
     output.appendChild(createNode(data));
     return;
   }
-  const filtered = filterTree(data, query.trim());
+  const filtered=filterTree(data, query.trim());
   if (filtered) {
-    output.appendChild(createNode(filtered, "search"));
+    output.appendChild(createNode(filtered,"search"));
   }
 }
-searchInput.addEventListener("input", debounce(handleSearch, time));
+searchInput.addEventListener("input", debounce(handleSearch,time));
 clearJson.addEventListener("click",()=>{
   textarea.value="";
 });
 
+// RECONVERSION OF UI TO JSON
 function createJson(element) {
-  let name = element.querySelector(".label").textContent.slice(2);
-  let name1;
-  const isFolder = element.classList.contains("folder");
-  if(isFolder){
-    name1=name.replace(/\u2193|\u2191/,"");
-  }
+  const name=element.querySelector(".label").textContent.slice(2);
+  const isFolder=element.classList.contains("folder");
   if (!isFolder) {
     return { name, type: "file" };
   }
-  const childrenContainer = element.querySelector(".children");
-  const children = [];
+  const childrenContainer=element.querySelector(".children");
+  const children=[];
   if (childrenContainer) {
-    const childNodes= childrenContainer.children;
-    for (let i = 0; i < childNodes.length; i++) {
-      const childJson = createJson(childNodes[i]);
+    const childNodes=childrenContainer.children;
+    for (let i=0;i<childNodes.length;i++) {
+      const childJson=createJson(childNodes[i]);
       if (childJson) {
         children.push(childJson);
       }
     }
   }
-  return { name1, type: "folder", children };
+  return { name, type: "folder", children };
 }
-toJson.addEventListener("click" , ()=>{
+toJson.addEventListener("click", ()=>{
   const dem=document.querySelector("#output > .folder");
   const json=createJson(dem);
   const newJson=JSON.stringify(json,null,1);
   textarea.value=newJson;
 });
+
+// const searchIcon=document.getElementById("search-icon");
+// const headSec=document.querySelector(".header");
+// const mobile=document.querySelector(".mobile");
+
+// function moveSearch() {
+//   if (window.innerWidth <= 600) {
+//     mobile.appendChild(searchInput);
+//     mobile.appendChild(searchIcon);
+//   // } else {
+//   //   headSec.appendChild(searchInput);
+//   // }
+// }}
+// window.addEventListener("resize", moveSearch);
+// window.addEventListener("load", moveSearch);
