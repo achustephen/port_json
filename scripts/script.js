@@ -1,4 +1,4 @@
-import {debounce} from './utils.js';
+import {debounce,updateJSON} from './utils.js';
 import {type,time,egJson} from './constants.js';
 
 //HTML ELEMENTS
@@ -6,120 +6,178 @@ const convertBtn=document.getElementById("convert-btn");
 const clearBtn=document.getElementById("clear-btn");
 const output=document.getElementById("output");
 const searchInput=document.getElementById("searchInput");
-const clearJson=document.getElementById("clearJson");
-const toJson=document.getElementById("reconvert");
 
 // NODE CREATION
-function createNode(node,mode="normal") {
+function createNode(node,mode="normal"){
   const element=document.createElement("div");
-  const renameBtn=document.createElement("button");
-  renameBtn.className="rename-btn";
-  renameBtn.textContent="Rename";
 
-  // RENAME LOGIC 
-  renameBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    renameBtn.style.display="none";
-    const label=element.querySelector(".label");
-    const input=document.createElement("input");
-    input.classList.add("rename-input");
-    input.value=node.name;
-    label.replaceWith(input);
-    input.focus();
-    function save(){
-      const newName=input.value.trim();
-      node.name=newName;
-      const newLabel=document.createElement("span");
-      newLabel.classList.add("label");
-      const icon=node.type===type.folder ? "📁 " : "📄 ";
-      newLabel.textContent=icon+newName;
-      input.replaceWith(newLabel);
-      updateJSON();
-    }
-    input.addEventListener("blur", save);
-    input.addEventListener("keydown", (e) => {
-      if (e.key==="Enter"){
-        input.blur();
-      }
+    // MENU CREATION
+  function createMenu(node){
+    const menu=document.createElement("ul");
+    menu.classList.add("menu");
+    menu.innerHTML = `
+      <li><button class="menu-btns add-file">New File</button></li>
+      <li><button class="menu-btns add-folder">New Folder</button></li>
+      <li><button class="menu-btns rename">Rename</button></li> `;
+      // <li><button class="menu-btns delete">Delete</button></li> `;
+
+    // RENAME EVENT LISTENER
+    menu.querySelector(".rename").addEventListener("click",()=>{
+    menu.style.display="none";
+    node.isNew=true;
+    output.innerHTML="";
+    output.appendChild(createNode(data,"search"));
     });
-  });
+
+    // EVENT LISTENER FOR ADDING FILE
+    menu.querySelector(".add-file").addEventListener("click",()=>{
+      menu.style.display="none"; 
+      addNew(node,"file"); 
+    });
+
+    // EVENT LISTENER FOR ADDING FOLDER
+    menu.querySelector(".add-folder").addEventListener("click",()=>{
+      menu.style.display="none";
+      addNew(node,"folder"); 
+    });
+    return menu;
+  }
+
+    // FUNCTION TO ADD NEW FILE OR FOLDER
+  function addNew(node, type){
+    if (node.type!=="folder") return;
+    if (!node.children){
+      node.children=[];
+    }
+    const newNode={
+      name:type==="file" ? "New File" : "New Folder",
+      type:type,
+      isNew:true
+    };
+    if(type==="folder"){
+      newNode.children=[];
+    }
+    node.children.push(newNode);
+    updateJSON(data);
+    output.innerHTML= "";
+    output.appendChild(createNode(data,"search"));
+  }
 
   //CREATES UI FOR FOLDER OR FILE
-  if (node.type===type.folder) {
+  if(node.type===type.folder){
     element.classList.add("folder");
     const header=document.createElement("div");
     header.classList.add("folder-header");
     const label=document.createElement("span");
     label.classList.add("label");
     label.textContent="📁 " + node.name;
+    if(node.isNew){
+    const input=document.createElement("input");
+    input.classList.add("name-input");
+    input.value=node.name;
+    header.appendChild(input);
+    input.focus();
+    input.addEventListener("blur",()=>{
+      node.name=input.value.trim();
+      node.isNew=false;
+      updateJSON(data);
+      output.innerHTML="";
+      output.appendChild(createNode(data,"search"));
+    });
+    input.addEventListener("keydown",(e)=>{
+      if(e.key==="Enter"){
+        input.blur();
+      }
+    });
+  }
+    if(!node.isNew){
     header.appendChild(label);
-    element.appendChild(renameBtn);
+    }
+    const menu=createMenu(node);
+    element.appendChild(menu);
     element.appendChild(header);
     const children=document.createElement("div");
     children.classList.add("children");
-    if (mode==="normal") {
+    if(mode==="normal"){
       children.classList.add("hidden");
     }
-    if (node.children) {
+    if(node.children){
       node.children.forEach(child => {
-        children.appendChild(createNode(child, mode));
+        children.appendChild(createNode(child,mode));
       });
     }
     element.appendChild(children);
-    header.addEventListener("click", (e) => {
-      if(e.target.closest(".rename-btn")) return;
+    header.addEventListener("click",(e) => {
+      if(e.target.closest(".menu-btns")) return;
       children.classList.toggle("hidden");
     });
   } 
-  else {
+  else{
     element.classList.add("file");
     const label=document.createElement("span");
     label.classList.add("label");
-    label.textContent= "📄 " + node.name;
+    label.textContent="📄 " +node.name;
+    if(node.isNew){
+    const input=document.createElement("input");
+    input.classList.add("name-input");
+    input.value=node.name;
+    element.appendChild(input);
+    input.focus();
+    input.addEventListener("blur",()=>{
+      node.name=input.value.trim() || node.name;
+      node.isNew=false;
+      updateJSON(data);
+      output.innerHTML="";
+      output.appendChild(createNode(data,"search"));
+    });
+    input.addEventListener("keydown",(e)=>{
+      if(e.key==="Enter"){
+        input.blur();
+      }
+    });
+  }
+    if(!node.isNew){
     element.appendChild(label);
-    element.appendChild(renameBtn);
+    }
+    const menu=createMenu(node);
+    element.appendChild(menu);
   }
   return element;
 }
 
-// JSON UPDATE
-  function updateJSON() {
-    document.getElementById("jsonInput").value=JSON.stringify(data,null,1);
-  }
-
 // RIGHT CLICK
 document.addEventListener("contextmenu", (e) => {
-  const item= e.target.closest(".folder, .file");
+  const item=e.target.closest(".folder, .file");
   if (!item) return;
   e.preventDefault();
-  document.querySelectorAll(".rename-btn").forEach(btn => {
-    btn.style.display= "none";
+  document.querySelectorAll(".menu").forEach(menu => {
+    menu.style.display = "none";
   });
-  const btn= item.querySelector(".rename-btn");
-  if (!btn) return;
-  btn.style.display= "block";
-  btn.style.position= "absolute";
-  btn.style.top = (e.clientY + 5) + "px";
-  btn.style.left = (e.clientX + 5) + "px";
+  const btns=item.querySelector(".menu");
+  if (!btns) return;
+  btns.style.display="flex";
+  btns.style.position="absolute";
+  btns.style.top=(e.clientY + 5) + "px";
+  btns.style.left=(e.clientX + 5) + "px";
 });
 
-// CLICK TO HIDE BUTTON
-document.addEventListener("click", (e) => {
-  document.querySelectorAll(".rename-btn").forEach(btn => {
-    btn.style.display="none";
+// CLICK TO HIDE MENU
+document.addEventListener("click",() => {
+  document.querySelectorAll(".menu").forEach(menu => {
+    menu.style.display = "none";
   });
 });
 
 // SEARCH FILTERING
-function filterTree(node,text) {
+function filterTree(node,text){
   const match=node.name.toLowerCase().includes(text);
   if (node.type===type.file) {
     return match?node:null;
   }
   let children= [];
   if (node.children) {
-    for (let child of node.children) {
-      const result=filterTree(child, text);
+    for(let child of node.children){
+      const result=filterTree(child,text);
       if (result) children.push(result);
     }
   }
@@ -169,53 +227,8 @@ function handleSearch() {
     return;
   }
   const filtered=filterTree(data, query.trim());
-  if (filtered) {
+  if (filtered){
     output.appendChild(createNode(filtered,"search"));
   }
 }
 searchInput.addEventListener("input", debounce(handleSearch,time));
-clearJson.addEventListener("click",()=>{
-  textarea.value="";
-});
-
-// RECONVERSION OF UI TO JSON
-function createJson(element) {
-  const name=element.querySelector(".label").textContent.slice(2);
-  const isFolder=element.classList.contains("folder");
-  if (!isFolder) {
-    return { name, type: "file" };
-  }
-  const childrenContainer=element.querySelector(".children");
-  const children=[];
-  if (childrenContainer) {
-    const childNodes=childrenContainer.children;
-    for (let i=0;i<childNodes.length;i++) {
-      const childJson=createJson(childNodes[i]);
-      if (childJson) {
-        children.push(childJson);
-      }
-    }
-  }
-  return { name, type: "folder", children };
-}
-toJson.addEventListener("click", ()=>{
-  const dem=document.querySelector("#output > .folder");
-  const json=createJson(dem);
-  const newJson=JSON.stringify(json,null,1);
-  textarea.value=newJson;
-});
-
-// const searchIcon=document.getElementById("search-icon");
-// const headSec=document.querySelector(".header");
-// const mobile=document.querySelector(".mobile");
-
-// function moveSearch() {
-//   if (window.innerWidth <= 600) {
-//     mobile.appendChild(searchInput);
-//     mobile.appendChild(searchIcon);
-//   // } else {
-//   //   headSec.appendChild(searchInput);
-//   // }
-// }}
-// window.addEventListener("resize", moveSearch);
-// window.addEventListener("load", moveSearch);
