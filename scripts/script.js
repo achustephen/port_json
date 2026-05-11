@@ -18,8 +18,8 @@ function createNode(node,mode="normal"){
     menu.innerHTML = `
       <li><button class="menu-btns add-file">New File</button></li>
       <li><button class="menu-btns add-folder">New Folder</button></li>
-      <li><button class="menu-btns rename">Rename</button></li> `;
-      // <li><button class="menu-btns delete">Delete</button></li> `;
+      <li><button class="menu-btns rename">Rename</button></li>
+      <li><button class="menu-btns delete">Delete</button></li> `;
 
     // RENAME EVENT LISTENER
     menu.querySelector(".rename").addEventListener("click",()=>{
@@ -32,29 +32,45 @@ function createNode(node,mode="normal"){
     // EVENT LISTENER FOR ADDING FILE
     menu.querySelector(".add-file").addEventListener("click",()=>{
       menu.style.display="none"; 
-      addNew(node,"file"); 
+      addNew(node,type.file); 
     });
 
     // EVENT LISTENER FOR ADDING FOLDER
     menu.querySelector(".add-folder").addEventListener("click",()=>{
       menu.style.display="none";
-      addNew(node,"folder"); 
+      addNew(node,type.folder); 
     });
+
+    // DELETE EVENT LISTENER
+    menu.querySelector(".delete").addEventListener("click",()=>{
+      menu.style.display="none";
+      deleteNode(data,node);
+    });
+
     return menu;
   }
 
+  // FUNCTION TO DELETE NODE
+  function deleteNode(data,node){
+    if(node.type===type.folder){
+      node.children.length=0;
+      let res=data.filter(obj => obj.name!==node.name);
+      console.log(res);
+      updateJSON(data);
+    }
+  }
     // FUNCTION TO ADD NEW FILE OR FOLDER
-  function addNew(node, type){
-    if (node.type!=="folder") return;
+  function addNew(node, nodeType){
+    if (node.type!==type.folder) return;
     if (!node.children){
       node.children=[];
     }
     const newNode={
-      name:type==="file" ? "New File" : "New Folder",
-      type:type,
+      name:nodeType===type.file ? "New File" : "New Folder",
+      type:nodeType,
       isNew:true
     };
-    if(type==="folder"){
+    if(nodeType===type.folder){
       newNode.children=[];
     }
     node.children.push(newNode);
@@ -124,7 +140,7 @@ function createNode(node,mode="normal"){
     element.appendChild(input);
     input.focus();
     input.addEventListener("blur",()=>{
-      node.name=input.value.trim() || node.name;
+      node.name=input.value.trim();
       node.isNew=false;
       updateJSON(data);
       output.innerHTML="";
