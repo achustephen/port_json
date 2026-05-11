@@ -25,24 +25,22 @@ body{
     color:aqua;
     font-family:'Verdana', sans-serif;
 }
-#searchInput{
+.search{
     right:0;
-    margin-left:860px;
     background-color: rgb(19, 17, 20);
     border-radius:15px;
     border:1px solid black;
     color:white;
     height:30px;
-    width:200px;
+    width:180px;
     font-size:17px;
     padding:3px;
 }
-#search-icon{
+.search-icon{
     background-color:rgb(30, 28, 34);
-    border:5px rgb(40, 38, 45);
-    margin-left:1px;
+    border:2px rgb(40, 38, 45);
     border-radius:5px;
-    padding:4px;
+    padding:1px;
 }
 .home {
     display:flex;
@@ -78,24 +76,7 @@ body{
     background-color:aliceblue;
     transition:0.3s;
 }
-#reconvert{
-    background-color:black;
-    color:white;
-    padding:10px 15px;
-    font-size:16px;
-    border:none;
-    border-radius:4px;
-    cursor:pointer;
-    margin-top:10px;
-}
-#reconvert:hover{
-     transform:translateY(-3px);
-     color:mediumpurple;
-}
-#reconvert:active{
-    background-color:aliceblue;
-    transition:0.3s;
-}
+
 textarea {
     width:98%;
     height:500px;
@@ -172,7 +153,7 @@ textarea {
     color:aqua;
 }
 
-.name-input, .file-input {
+.name-input{
   background:transparent;
   border:1px solid grey;
   color:white;

@@ -6,7 +6,6 @@ export function debounce(func, delay) {
       func(...args)}, delay);
   };
 }
-
 export function updateJSON(data){
   document.getElementById("jsonInput").value =
     JSON.stringify(data, (key, value) => {

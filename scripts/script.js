@@ -45,13 +45,28 @@ function createNode(node,mode="normal"){
     menu.querySelector(".delete").addEventListener("click",()=>{
       menu.style.display="none";
       deleteNode(data,node);
+      updateJSON(data);
+      output.innerHTML="";
+      output.appendChild(createNode(data,"search"));
     });
-
     return menu;
   }
 
   // FUNCTION TO DELETE NODE
-  function deleteNode(data,node){
+  function deleteNode(tree,node){
+    if(tree===node){
+      console.log(tree);
+      data=null;
+      output.innerHTML="";
+      return;
+    }
+    if(!tree.children) return;
+    tree.children=tree.children.filter(
+      child=>child !== node
+    );
+    tree.children.forEach(child => {
+    deleteNode(child, node);
+    });
   }
     // FUNCTION TO ADD NEW FILE OR FOLDER
   function addNew(node, nodeType){
