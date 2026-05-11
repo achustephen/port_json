@@ -52,12 +52,6 @@ function createNode(node,mode="normal"){
 
   // FUNCTION TO DELETE NODE
   function deleteNode(data,node){
-    if(node.type===type.folder){
-      node.children.length=0;
-      let res=data.filter(obj => obj.name!==node.name);
-      console.log(res);
-      updateJSON(data);
-    }
   }
     // FUNCTION TO ADD NEW FILE OR FOLDER
   function addNew(node, nodeType){
