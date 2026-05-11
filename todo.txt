@@ -3,6 +3,11 @@ what is the relevance of mode*
 create constants for file and folder and debounce interval*
 functionality of filterTree(recursion)*
 search button removal*
+add file or folder and update json*
+capital constants*
+give time interval a meaningful name*
 
 filtering using file type(js,css)
-add file or folder and update json
+
+create generic functions for add,delete and create a function for context menu(try to make it generic) and move them into utils.do check other functions or code that can be shifted to utils.
+better comments-add meaningful comments for each logic

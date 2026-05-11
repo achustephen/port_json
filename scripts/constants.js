@@ -1,9 +1,9 @@
-export const type={
+export const NODE_TYPE={
     "folder":"folder",
     "file":"file"
 };
-export const time=250;
-export const egJson=`{
+export const DEBOUNCE_TIME_MS=250;
+export const EXAMPLE_JSON=`{
  "name": "Portfolio",
  "type": "folder",
  "children": [
