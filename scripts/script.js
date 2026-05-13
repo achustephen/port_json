@@ -1,4 +1,4 @@
-import {debounce,updateJSON,createMenu,deleteNode,addNewNode} from './utils.js';
+import {debounce,updateJSON,createMenu} from './utils.js';
 import {NODE_TYPE,DEBOUNCE_TIME_MS,EXAMPLE_JSON} from './constants.js';
 
 //HTML ELEMENTS REFERENCE

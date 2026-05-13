@@ -49,30 +49,31 @@ export function createMenu(node,data,output,NODE_TYPE,createNode){
     // EVENT LISTENER FOR DELETING FILE OR FOLDER
     menu.querySelector(".delete").addEventListener("click",()=>{
       menu.style.display="none";
-      deleteNode(data,node,output);
+      data=deleteNode(data,node);
       updateJSON(data);
       output.innerHTML="";
-      output.appendChild(createNode(data,"search"));
+      if(data){
+        output.appendChild(createNode(data,"search"));
+      }
     });
     return menu;
   }
   // FUNCTION TO DELETE A FILE OR FOLDER
-  export function deleteNode(tree,node,output){
-      if(tree===node){
-        // tree=null;
-        // output.innerHTML="";
-        return null;
-      }
-      // RETURN IF NO CHILDREN TO CHECK
-      if(!tree.children) return;
-      tree.children=tree.children.filter(
+  export function deleteNode(tree,node){
+    if(tree===node){
+      return null;
+    }
+    // RETURN IF NO CHILDREN TO CHECK
+    if(!tree.children) return tree;
+    tree.children=tree.children.filter(
         child=>child!==node
       );
-      // RECURSIVELY CHECK CHILDREN TO DELETE NODE
-      tree.children.forEach(child=>{
-      deleteNode(child,node,output);
-      });
-    }
+    // RECURSIVELY CHECK CHILDREN TO DELETE NODE
+    tree.children.forEach(child=>{
+      deleteNode(child,node);
+    });
+    return tree;
+  }
 
     // FUNCTION TO ADD NEW FILE OR FOLDER
     export function addNewNode(node,nodeType,NODE_TYPE,data,output,createNode){
