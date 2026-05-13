@@ -1,13 +1,14 @@
-arrow constants*
 what is the relevance of mode*
-create constants for file and folder and debounce interval*
+create constants for file,folder and debounce interval*
 functionality of filterTree(recursion)*
 search button removal*
 add file or folder and update json*
 capital constants*
 give time interval a meaningful name*
+better comments-add meaningful comments for each logic*
+move the search icon inside the input field*
+filtering using file type(js,css)*
+create generic functions for add,delete*
+create a function for context menu(try to make it generic) and move it into utils*
 
-filtering using file type(js,css)
-
-create generic functions for add,delete and create a function for context menu(try to make it generic) and move them into utils.do check other functions or code that can be shifted to utils.
-better comments-add meaningful comments for each logic
+do check other functions or code that can be shifted to utils.

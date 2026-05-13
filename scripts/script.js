@@ -1,4 +1,4 @@
-import {debounce,updateJSON} from './utils.js';
+import {debounce,updateJSON,createMenu,deleteNode,addNewNode} from './utils.js';
 import {NODE_TYPE,DEBOUNCE_TIME_MS,EXAMPLE_JSON} from './constants.js';
 
 //HTML ELEMENTS REFERENCE
@@ -6,90 +6,12 @@ const convertBtn=document.getElementById("convert-btn");
 const clearBtn=document.getElementById("clear-btn");
 const output=document.getElementById("output");
 const searchInput=document.getElementById("searchInput");
+const filterInput=document.getElementById("filterInput");
 
 // FUNCTION TO CREATE FOLDER OR FILE NODE IN UI
-function createNode(node,mode="normal"){
+export function createNode(node,mode="normal"){
   const element=document.createElement("div");
-
-    // FUNCTION TO CREATE CONTEXT MENU
-  function createMenu(node){
-    const menu=document.createElement("ul");
-    menu.classList.add("menu");
-    menu.innerHTML = `
-      <li><button class="menu-btns add-file">New File</button></li>
-      <li><button class="menu-btns add-folder">New Folder</button></li>
-      <li><button class="menu-btns rename">Rename</button></li>
-      <li><button class="menu-btns delete">Delete</button></li> `;
-
-    // EVENT LISTENER FOR RENAMING FILE OR FOLDER
-    menu.querySelector(".rename").addEventListener("click",()=>{
-    menu.style.display="none";
-    node.isNew=true;
-    output.innerHTML="";
-    output.appendChild(createNode(data,"search"));
-    });
-
-    // EVENT LISTENER FOR ADDING FILE
-    menu.querySelector(".add-file").addEventListener("click",()=>{
-      menu.style.display="none"; 
-      addNew(node,NODE_TYPE.file); 
-    });
-
-    // EVENT LISTENER FOR ADDING FOLDER
-    menu.querySelector(".add-folder").addEventListener("click",()=>{
-      menu.style.display="none";
-      addNewNode(node,NODE_TYPE.folder); 
-    });
-
-    // EVENT LISTENER FOR DELETING FILE OR FOLDER
-    menu.querySelector(".delete").addEventListener("click",()=>{
-      menu.style.display="none";
-      deleteNode(data,node);
-      updateJSON(data);
-      output.innerHTML="";
-      output.appendChild(createNode(data,"search"));
-    });
-    return menu;
-  }
-
-  // FUNCTION TO DELETE EXISTING NODE
-  function deleteNode(tree,node){
-    if(tree===node){
-      data=null;
-      output.innerHTML="";
-      return;
-    }
-    // RETURN IF NO CHILDREN TO CHECK
-    if(!tree.children) return;
-    tree.children=tree.children.filter(
-      child=>child!==node
-    );
-    // RECURSIVELY CHECK CHILDREN TO DELETE NODE
-    tree.children.forEach(child=>{
-    deleteNode(child,node);
-    });
-  }
-    // FUNCTION TO ADD NEW FILE OR FOLDER
-  function addNewNode(node,nodeType){
-    if (node.type!==NODE_TYPE.folder) return;
-    if (!node.children){
-      node.children=[];
-    }
-    const newNode={
-      name:nodeType===NODE_TYPE.file ? "New File" : "New Folder",
-      type:nodeType,
-      isNew:true
-    };
-    if(nodeType===NODE_TYPE.folder){
-      newNode.children=[];
-    }
-    // ADD NEW NODE TO DATA STRUCTURE,UPDATE JSON AND UPDATE UI
-    node.children.push(newNode);
-    updateJSON(data);
-    output.innerHTML="";
-    output.appendChild(createNode(data,"search"));
-  }
-
+ 
   //CREATES UI FOR FOLDER OR FILE
   if(node.type===NODE_TYPE.folder){
     element.classList.add("folder");
@@ -98,6 +20,7 @@ function createNode(node,mode="normal"){
     const label=document.createElement("span");
     label.classList.add("label");
     label.textContent="📁 "+node.name;
+
     // IF NEW NODE, SHOW INPUT FIELD FOR ENTERING FILE NAME
     if(node.isNew){
     const input=document.createElement("input");
@@ -105,6 +28,7 @@ function createNode(node,mode="normal"){
     input.value=node.name;
     header.appendChild(input);
     input.focus();
+
     // EVENT LISTENER TO SAVE NEW FILE NAME ON BLUR OR ENTER KEY
     input.addEventListener("blur",()=>{
       node.name=input.value.trim();
@@ -122,10 +46,11 @@ function createNode(node,mode="normal"){
     if(!node.isNew){
     header.appendChild(label);
     }
-    const menu=createMenu(node);
+    const menu=createMenu(node,data,output,NODE_TYPE,createNode);
     element.appendChild(menu);
     element.appendChild(header);
-    // CREATE CHILDREN CONTAINER FOR FOLDERS AND RECURSIVELY CREATE CHILD NODES
+
+    // CREATES CHILDREN CONTAINER FOR FOLDERS AND RECURSIVELY CREATES CHILD NODES
     const children=document.createElement("div");
     children.classList.add("children");
     if(mode==="normal"){
@@ -137,12 +62,14 @@ function createNode(node,mode="normal"){
       });
     }
     element.appendChild(children);
+
     // EVENT LISTENER TO TOGGLE FOLDER OPEN/CLOSE ON HEADER CLICK
     header.addEventListener("click",(e)=>{
       if(e.target.closest(".menu-btns")) return;
       children.classList.toggle("hidden");
     });
   } 
+
   // IF NODE IS A FILE, CREATE FILE ELEMENT WITH CONTEXT MENU USING SIMILAR LOGIC AS FOLDER
   else{
     element.classList.add("file");
@@ -171,38 +98,57 @@ function createNode(node,mode="normal"){
     if(!node.isNew){
     element.appendChild(label);
     }
-    const menu=createMenu(node);
+    const menu=createMenu(node,data,output,NODE_TYPE,createNode);
     element.appendChild(menu);
   }
   return element;
 }
+// FUNCTION CALL TO DISPLAY CONTEXT MENU ON RIGHT CLICK
+handleContextMenu();
 
-// CONTEXT MENU HANDLING-RIGHT CLICK TO SHOW MENU
-document.addEventListener("contextmenu",(e)=>{
-  const item=e.target.closest(".folder, .file");
-  if (!item) return;
-  e.preventDefault();
-  document.querySelectorAll(".menu").forEach(menu => {
+// FUNCTION FOR CONTEXT MENU HANDLING-RIGHT CLICK TO SHOW MENU
+function handleContextMenu(e){
+  document.addEventListener("contextmenu",(e)=>{
+    const item=e.target.closest(".folder, .file");
+    if (!item) return;
+    e.preventDefault();
+    document.querySelectorAll(".menu").forEach(menu => {
     menu.style.display="none";
+    });
+    // LOGIC TO DISPLAY MENU FOR CLICKED ITEM
+    const btns=item.querySelector(".menu");
+    if (!btns) return;
+    btns.style.display="flex";
+    btns.style.position="absolute";
+    btns.style.top=(e.clientY + 5)+"px";
+    btns.style.left=(e.clientX + 5)+"px";
   });
-  // LOGIC TO DISPLAY MENU FOR CLICKED ITEM
-  const btns=item.querySelector(".menu");
-  if (!btns) return;
-  btns.style.display="flex";
-  btns.style.position="absolute";
-  btns.style.top=(e.clientY + 5)+"px";
-  btns.style.left=(e.clientX + 5)+"px";
-});
 
-// EVENT LISTENER TO HIDE CONTEXT MENU ON ANY CLICK OUTSIDE
-document.addEventListener("click",()=>{
-  document.querySelectorAll(".menu").forEach(menu=>{
-    menu.style.display="none";
+  // EVENT LISTENER TO HIDE CONTEXT MENU ON ANY CLICK OUTSIDE
+  document.addEventListener("click",()=>{
+    document.querySelectorAll(".menu").forEach(menu=>{
+      menu.style.display="none";
+    });
   });
-});
+}
+let data;
+// FUNCTION TO GENERATE FOLDER STRUCTURE UI FROM JSON INPUT
+function generateTree(){
+  const input=document.getElementById("jsonInput").value;
+  output.innerHTML="";
+
+  // PARSES JSON AND CREATES UI,ALERTS USER IF JSON IS INVALID
+  try {
+    data=JSON.parse(input);
+    output.appendChild(createNode(data));
+  } catch{
+    alert("Invalid JSON!");
+  }
+}
+convertBtn.addEventListener("click",generateTree);
 
 // FUNCTION TO FILTER TREE BASED ON SEARCH QUERY
-function filterTree(node,text){
+function searchTree(node,text){
   const match=node.name.toLowerCase().includes(text);
   if(node.type===NODE_TYPE.file){
     return match?node:null;
@@ -211,10 +157,11 @@ function filterTree(node,text){
   let children=[];
   if(node.children){
     for(let child of node.children){
-      const result=filterTree(child,text);
+      const result=searchTree(child,text);
       if (result) children.push(result);
     }
   }
+
   // IF CURRENT NODE OR ANY CHILD MATCHES,RETURN NODE WITH FILTERED CHILDREN
   if (match) return node;
   if (children.length>0){
@@ -226,21 +173,6 @@ function filterTree(node,text){
   }
   return null;
 }
-
-let data;
-// FUNCTION TO GENERATE FOLDER STRUCTURE UI FROM JSON INPUT
-function generateTree(){
-  const input=document.getElementById("jsonInput").value;
-  output.innerHTML="";
-  // PARSES JSON AND CREATES UI,ALERTS USER IF JSON IS INVALID
-  try {
-    data=JSON.parse(input);
-    output.appendChild(createNode(data));
-  } catch{
-    alert("Invalid JSON!");
-  }
-}
-convertBtn.addEventListener("click",generateTree);
 
 // LOADS EXAMPLE JSON INTO TEXTAREA
 const textarea=document.getElementById("jsonInput");
@@ -255,18 +187,57 @@ clearBtn.addEventListener("click",()=>{
 // FUNCTION TO HANDLE SEARCH INPUT AND UPDATE UI WITH FILTERED RESULTS
 function handleSearch(){
   if (!data) return;
-  const query=searchInput.value.toLowerCase();
+  const searchQuery=searchInput.value.toLowerCase();
   output.innerHTML="";
-  if (!query) {
+  if (!searchQuery){
     output.appendChild(createNode(data));
     return;
   }
   // FILTERS THE TREE BASED ON SEARCH QUERY AND UPDATES UI WITH MATCHING NODES
-  const filtered=filterTree(data,query.trim());
-  if (filtered){
-    output.appendChild(createNode(filtered,"search"));
+  const searchResult=searchTree(data,searchQuery.trim());
+  if (searchResult){
+    output.appendChild(createNode(searchResult,"search"));
   }
 }
 // EVENT LISTENER TO IMPLEMENT DEBOUNCE ON SEARCH INPUT
 searchInput.addEventListener("input",debounce(handleSearch,DEBOUNCE_TIME_MS));
 
+// FUNCTION TO FILTER FILES BASED ON EXTENSION
+function filterFiles(node,extension){
+  const queryMatch=node.name.toLowerCase().endsWith(extension);
+
+  // IF NODE IS A FILE,RETURN IT IF IT MATCHES THE QUERY
+  if(node.type===NODE_TYPE.file){
+    return queryMatch? [node] : [];
+  }
+  // IF NODE IS A FOLDER,RECURSIVELY CHECK CHILDREN AND ADD MATCHING FILES INTO RESULT
+  let files=[];
+  if(node.children){
+    for(let child of node.children){
+      const result=filterFiles(child,extension);
+      if(result)
+      files.push(...result);
+    }
+  }
+  return files;
+}
+
+// FUNCTION TO HANDLE FILTER SEARCH AND UPDATE UI WITH FILTERED FILES
+function handleFilter(){
+ if (!data) return;
+   const filterQuery=filterInput.value.toLowerCase();
+  output.innerHTML="";
+  if (!filterQuery){
+    output.appendChild(createNode(data));
+    return;
+  }
+  // FILTERS THE TREE AND GENERATES MATCHING FILES UI BASED ON EXTENSION QUERY
+  const filterResult=filterFiles(data,filterQuery.trim());
+  if(filterResult.length>0){
+    filterResult.forEach(file=>{
+      output.appendChild(createNode(file,"search"));
+    });
+  }
+}
+// EVENT LISTENER TO IMPLEMENT DEBOUNCE ON FILTER INPUT
+filterInput.addEventListener("input",debounce(handleFilter,DEBOUNCE_TIME_MS));
