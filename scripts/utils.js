@@ -121,3 +121,49 @@ export function handleContextMenu(){
     });
   });
 }
+
+// FUNCTION TO FILTER FILES BASED ON EXTENSION
+export function filterFiles(node,extension){
+  const queryMatch=node.name.toLowerCase().endsWith(extension);
+
+  // IF NODE IS A FILE,RETURN IT IF IT MATCHES THE QUERY
+  if(node.type===NODE_TYPE.file){
+    return queryMatch? [node] : [];
+  }
+  // IF NODE IS A FOLDER,RECURSIVELY CHECK CHILDREN AND ADD MATCHING FILES INTO RESULT
+  let files=[];
+  if(node.children){
+    for(let child of node.children){
+      const result=filterFiles(child,extension);
+      if(result)
+      files.push(...result);
+    }
+  }
+  return files;
+}
+
+// FUNCTION TO FILTER TREE BASED ON SEARCH QUERY
+export function searchTree(node,text){
+  const match=node.name.toLowerCase().includes(text);
+  if(node.type===NODE_TYPE.file){
+    return match?node:null;
+  }
+  // IF NODE IS A FOLDER,RECURSIVELY CHECK CHILDREN AND INCLUDE FOLDER IF ANY CHILD MATCHES
+  let children=[];
+  if(node.children){
+    for(let child of node.children){
+      const result=searchTree(child,text);
+      if (result) children.push(result);
+    }
+  }
+  // IF CURRENT NODE OR ANY CHILD MATCHES,RETURN NODE WITH FILTERED CHILDREN
+  if (match) return node;
+  if (children.length>0){
+    return{
+      name:node.name,
+      type:node.type,
+      children:children
+    };
+  }
+  return null;
+}
