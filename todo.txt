@@ -11,4 +11,3 @@ filtering using file type(js,css)*
 create generic functions for add,delete*
 create a function for context menu(try to make it generic) and move it into utils*
 
-do check other functions or code that can be shifted to utils.

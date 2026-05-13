@@ -95,3 +95,29 @@ export function createMenu(node,data,output,NODE_TYPE,createNode){
       output.innerHTML="";
       output.appendChild(createNode(data,"search"));
     }
+
+    // FUNCTION FOR CONTEXT MENU HANDLING-RIGHT CLICK TO SHOW MENU
+export function handleContextMenu(){
+  document.addEventListener("contextmenu",(e)=>{
+    const item=e.target.closest(".folder, .file");
+    if (!item) return;
+    e.preventDefault();
+    document.querySelectorAll(".menu").forEach(menu => {
+    menu.style.display="none";
+    });
+    // LOGIC TO DISPLAY MENU FOR CLICKED ITEM
+    const btns=item.querySelector(".menu");
+    if (!btns) return;
+    btns.style.display="flex";
+    btns.style.position="absolute";
+    btns.style.top=(e.clientY+5)+"px";
+    btns.style.left=(e.clientX+5)+"px";
+  });
+
+  // EVENT LISTENER TO HIDE CONTEXT MENU ON ANY CLICK OUTSIDE
+  document.addEventListener("click",()=>{
+    document.querySelectorAll(".menu").forEach(menu=>{
+      menu.style.display="none";
+    });
+  });
+}

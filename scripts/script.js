@@ -1,4 +1,4 @@
-import {debounce,updateJSON,createMenu} from './utils.js';
+import {debounce,updateJSON,createMenu,handleContextMenu} from './utils.js';
 import {NODE_TYPE,DEBOUNCE_TIME_MS,EXAMPLE_JSON} from './constants.js';
 
 //HTML ELEMENTS REFERENCE
@@ -106,31 +106,6 @@ export function createNode(node,mode="normal"){
 // FUNCTION CALL TO DISPLAY CONTEXT MENU ON RIGHT CLICK
 handleContextMenu();
 
-// FUNCTION FOR CONTEXT MENU HANDLING-RIGHT CLICK TO SHOW MENU
-function handleContextMenu(e){
-  document.addEventListener("contextmenu",(e)=>{
-    const item=e.target.closest(".folder, .file");
-    if (!item) return;
-    e.preventDefault();
-    document.querySelectorAll(".menu").forEach(menu => {
-    menu.style.display="none";
-    });
-    // LOGIC TO DISPLAY MENU FOR CLICKED ITEM
-    const btns=item.querySelector(".menu");
-    if (!btns) return;
-    btns.style.display="flex";
-    btns.style.position="absolute";
-    btns.style.top=(e.clientY + 5)+"px";
-    btns.style.left=(e.clientX + 5)+"px";
-  });
-
-  // EVENT LISTENER TO HIDE CONTEXT MENU ON ANY CLICK OUTSIDE
-  document.addEventListener("click",()=>{
-    document.querySelectorAll(".menu").forEach(menu=>{
-      menu.style.display="none";
-    });
-  });
-}
 let data;
 // FUNCTION TO GENERATE FOLDER STRUCTURE UI FROM JSON INPUT
 function generateTree(){
@@ -138,10 +113,10 @@ function generateTree(){
   output.innerHTML="";
 
   // PARSES JSON AND CREATES UI,ALERTS USER IF JSON IS INVALID
-  try {
+  try{
     data=JSON.parse(input);
     output.appendChild(createNode(data));
-  } catch{
+  }catch{
     alert("Invalid JSON!");
   }
 }
@@ -176,7 +151,7 @@ function searchTree(node,text){
 
 // LOADS EXAMPLE JSON INTO TEXTAREA
 const textarea=document.getElementById("jsonInput");
-textarea.value=EXAMPLE_JSON; 
+textarea.value=EXAMPLE_JSON;
 
 // EVENT LISTENER TO CLEAR TEXTAREA AND OUTPUT
 clearBtn.addEventListener("click",()=>{
