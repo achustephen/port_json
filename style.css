@@ -57,23 +57,23 @@ body{
     color:gray;
     pointer-events:none;
 }
-.home {
+.home{
     display:flex;
     flex-direction:row;
 }
-.container1 {
+.container1{
     flex:2;
     background-color:black;
     padding:20px;
 }
-.container1 p {
+.container1 p{
     font-size:16px;
     line-height:1.5;
     padding-bottom:20px;
     color:mediumpurple;
     font-family:'Poppins', serif;
 }
-.btn {
+.btn{
     padding:10px 15px;
     font-size:16px;
     background-color:rgb(30, 28, 34);
@@ -92,7 +92,7 @@ body{
     transition:0.3s;
 }
 
-textarea {
+textarea{
     width:98%;
     height:500px;
     padding:30px 10px;
@@ -102,7 +102,7 @@ textarea {
     background-color:black;
     color:grey;
 }
-.container2 {
+.container2{
     flex:1;
     background-color:rgb(30, 28, 34);
     padding:20px;
@@ -178,7 +178,7 @@ textarea {
 .hidden{
     display:none;
 }
-.footer {
+.footer{
     background-color:rgb(40, 38, 43);
     padding-top:5px;
     text-align:center;
@@ -189,7 +189,7 @@ textarea {
     font-size:15px;
     padding-bottom:30px;
 }
-@media(max-width:600px) {
+@media(max-width:600px){
     .home{
         display:flex;
         flex-direction:column;
