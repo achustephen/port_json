@@ -44,7 +44,7 @@ export function createNode(node,mode="normal"){
     });
   }
     if(!node.isNew){
-    header.appendChild(label);
+      header.appendChild(label);
     }
     const menu=createMenu(node,data,output,NODE_TYPE,createNode);
     element.appendChild(menu);
@@ -152,7 +152,7 @@ searchInput.addEventListener("input",debounce(handleSearch,DEBOUNCE_TIME_MS));
 // FUNCTION TO HANDLE FILTER SEARCH AND UPDATE UI WITH FILTERED FILES
 function handleFilter(){
  if (!data) return;
-   const filterQuery=filterInput.value.toLowerCase();
+  const filterQuery=filterInput.value.toLowerCase();
   output.innerHTML="";
   if (!filterQuery){
     output.appendChild(createNode(data));

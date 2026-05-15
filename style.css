@@ -45,7 +45,7 @@ body{
     font-size:17px;
     border-radius:15px;
     border:1px solid black;
-    background-color:rgb(19, 18, 20);
+    background-color:rgb(8, 8, 8);
     color:white;
     box-sizing:border-box;
 }
@@ -91,7 +91,6 @@ body{
     background-color:aliceblue;
     transition:0.3s;
 }
-
 textarea{
     width:98%;
     height:500px;
@@ -113,13 +112,13 @@ textarea{
 }
 .menu{
     display:none;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
     position:absolute;
-    text-align: center;
+    text-align:center;
     background:black;
-    border: 1px solid black;
+    border:1px solid black;
     margin:5px;
     width:90px;
     list-style:none;
@@ -131,7 +130,7 @@ textarea{
     text-align:center;
     background:black;
     cursor:pointer;
-    padding:6px 6px ;
+    padding:6px 6px;
     font-size:14px;
     z-index:1000;
     margin-top:0px;
@@ -161,13 +160,11 @@ textarea{
     color:aqua;
     border-radius:4px;
 }
-
 .folder-header:active{
     transform:translateY(4px);
     background-color:rgb(21, 16, 28);
     color:aqua;
 }
-
 .name-input{
   background:transparent;
   border:1px solid grey;
