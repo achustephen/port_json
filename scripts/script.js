@@ -9,7 +9,7 @@ const searchInput=document.getElementById("searchInput");
 const filterInput=document.getElementById("filterInput");
 
 // FUNCTION TO CREATE FOLDER OR FILE NODE IN UI
-export function createNode(node,mode="normal"){
+function createNode(node,mode="normal"){
   const element=document.createElement("div");
  
   //CREATES UI FOR FOLDER OR FILE
@@ -23,26 +23,26 @@ export function createNode(node,mode="normal"){
 
     // IF NEW NODE, SHOW INPUT FIELD FOR ENTERING FILE NAME
     if(node.isNew){
-    const input=document.createElement("input");
-    input.classList.add("name-input");
-    input.value=node.name;
-    header.appendChild(input);
-    input.focus();
+      const input=document.createElement("input");
+      input.classList.add("name-input");
+      input.value=node.name;
+      header.appendChild(input);
+      input.focus();
 
-    // EVENT LISTENER TO SAVE NEW FILE NAME ON BLUR OR ENTER KEY
-    input.addEventListener("blur",()=>{
-      node.name=input.value.trim();
-      node.isNew=false;
-      updateJSON(data);
-      output.innerHTML="";
-      output.appendChild(createNode(data,"search"));
-    });
-    input.addEventListener("keydown",(e)=>{
-      if(e.key==="Enter"){
-        input.blur();
-      }
-    });
-  }
+      // EVENT LISTENER TO SAVE NEW FILE NAME ON BLUR OR ENTER KEY
+      input.addEventListener("blur",()=>{
+        node.name=input.value.trim();
+        node.isNew=false;
+        updateJSON(data);
+        output.innerHTML="";
+        output.appendChild(createNode(data,"search"));
+      });
+      input.addEventListener("keydown",(e)=>{
+        if(e.key==="Enter"){
+          input.blur();
+        }
+      });
+    }
     if(!node.isNew){
       header.appendChild(label);
     }
